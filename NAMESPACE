@@ -1,0 +1,10 @@
+importFrom("stats","rnorm","runif")
+
+import(RSpectra)
+import(pracma)
+import(HDMFA)
+
+export(Distance)
+export(IALS)
+export(KIALS)
+
