@@ -4,64 +4,9 @@ IALS <- function(X,W1=NULL,W2=NULL,m1,m2,max_iter=100,ep=1e-6){
   p2=dim(X)[[3]]
   
   if(class(W1)[1]=="NULL"&class(W2)[1]=="NULL"){
-    if (m1==1 & m2==1){
-      W1=W2=matrix(1,p1,1)
-    }
-    else if (m1==1 & m2!=1){
-      W1=matrix(1,p1,1)
-      W2=matrix(1,p2,m2)
-      for(i in 2:m2){
-        w2i=c(rep(1,i-1),rep(-1,i-1))
-        w2i_length=length(w2i)
-        d1=p2%/%w2i_length
-        d2=p2%%w2i_length
-        if(d2==0){
-          W2[,i]=rep(w2i,d1)
-        } else{
-          W2[,i]=c(rep(w2i,d1),w2i[1:d2])
-        }
-      }
-    }
-    else if (m1!=1 & m2==1){
-      W1=matrix(1,p1,m1)
-      W2=matrix(1,p2,1)
-      for(i in 2:m1){
-        w1i=c(rep(1,i-1),rep(-1,i-1))
-        w1i_length=length(w1i)
-        d1=p1%/%w1i_length
-        d2=p1%%w1i_length
-        if(d2==0){
-          W1[,i]=rep(w1i,d1)
-        } else{
-          W1[,i]=c(rep(w1i,d1),w1i[1:d2])
-        }
-      }
-    }else{
-      W1=matrix(1,p1,m1)
-      W2=matrix(1,p2,m2)
-      for(i in 2:m1){
-        w1i=c(rep(1,i-1),rep(-1,i-1))
-        w1i_length=length(w1i)
-        d1=p1%/%w1i_length
-        d2=p1%%w1i_length
-        if(d2==0){
-          W1[,i]=rep(w1i,d1)
-        } else{
-          W1[,i]=c(rep(w1i,d1),w1i[1:d2])
-        }
-      }
-      for(i in 2:m2){
-        w2i=c(rep(1,i-1),rep(-1,i-1))
-        w2i_length=length(w2i)
-        d1=p2%/%w2i_length
-        d2=p2%%w2i_length
-        if(d2==0){
-          W2[,i]=rep(w2i,d1)
-        } else{
-          W2[,i]=c(rep(w2i,d1),w2i[1:d2])
-        }
-      }
-    }
+    fit=alpha_PCA(X, m1, m2, alpha = 0)
+    W1=fit$R
+    W2=fit$C
   }else{
     W1=W1;W2=W2
   }
@@ -139,5 +84,5 @@ KIALS <- function(X,W1=NULL,W2=NULL,kmax,max_iter=100,ep=1e-6){
   eigC=eigen(sumF_c%*%t(sumF_c))$values[1:(1+kmax)]
   k2=which.max(eigC[1:kmax]/(eigC[2:(1+kmax)]))
   
-  return(list(k1=k1,k2=k1))
+  return(list(k1=k1,k2=k2))
 }

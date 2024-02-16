@@ -1,7 +1,7 @@
 \name{IALS}
 \alias{IALS}
 \title{
-Iterative Alternating Least Square Algorithm for Large-dimensional Matrix Factor Model
+Iterative Alternating Least Square Estimation for Large-dimensional Matrix Factor Model
 }
 \description{
 This function is designed to fit the matrix factor model using the Iterative Least Squares (IALS) method, rather than Principal Component Analysis (PCA)-based methods. In detail, in the first step, we propose to estimate the latent factor matrices by projecting the matrix observations with two deterministic weight matrices, chosen to diversify away the idiosyncratic components. In the second step, we update the row/column loading matrices by minimizing the squared loss function under the identifiability condition. The estimators of the loading matrices are then treated as the new weight matrices, and the algorithm iteratively performs these two steps until a convergence criterion is reached.
@@ -14,10 +14,10 @@ IALS(X, W1 = NULL, W2 = NULL, m1, m2, max_iter = 100, ep = 1e-06)
   Input an array with \eqn{T \times p_1 \times p_2}, where \eqn{T} is the sample size, \eqn{p_1} is the the row dimension of each matrix observation and \eqn{p_2} is the the column dimension of each matrix observation.
 }
   \item{W1}{
-  The initial value for the row factor loading matrix. The default is NULL, with the initial value being Walsh-Hadamard matrix.
+  The initial value for the row factor loading matrix. The default is NULL, with an initial estimate chosen from \eqn{\alpha}-PCA if not provided.
 }
   \item{W2}{
-  The initial value for the column factor loading matrix. The default is NULL, with the initial value being Walsh-Hadamard matrix.
+  The initial value for the column factor loading matrix. The default is NULL, with an initial estimate chosen from \eqn{\alpha}-PCA if not provided.
 }
   \item{m1}{
   A positive integer indicating the row factor number.
@@ -33,7 +33,7 @@ IALS(X, W1 = NULL, W2 = NULL, m1, m2, max_iter = 100, ep = 1e-06)
 }
 }
 \details{
-Let \eqn{\bold{W}_i} be a given exogenous (or deterministic) \eqn{p_{i} \times m_{i}} matrix, \eqn{i=1,2}. We propose to estimate \eqn{\bold{F}_t}  simply by
+Assume we have two weight matrices \eqn{\bold{W}_i} of dimension \eqn{p_{i} \times m_{i}} for \eqn{i=1,2}, as substitutes for \eqn{\bold{R}} and \eqn{\bold{C}} respectively. Then it is straightforward to estimate \eqn{\bold{F}_t} simply by
 \deqn{\hat{\bold{F}}_{t}=\frac{1}{p_{1}p_{2}}\bold{W}_1^\top\bold{X}_t\bold{W}_2.}
 
 Given \eqn{\hat{\bold{F}}_t} and \eqn{\bold{W}_1}, we can derive that 
@@ -53,14 +53,14 @@ The return value is a list. In this list, it contains the following:
 \item{iter}{The number of iterations when the stopping criterion is met.}
 }
 \references{
-He, Y., Zhao, R., & Zhou, W. X. (2023). Iterative Least Squares Algorithm for Large-dimensional Matrix Factor Model by Random Projection. <arXiv:2301.00360>.
+He, Y., Zhao, R., & Zhou, W. X. (2023). Iterative Alternating Least Square Estimation for Large-dimensional Matrix Factor Model. <arXiv:2301.00360>.
 }
 \author{
 Yong He, Ran Zhao, Wen-Xin Zhou.
 }
 
 \examples{
-seed=11111
+set.seed(11111)
 T=20;p1=20;p2=20
 k1=3;k2=3
 
@@ -82,9 +82,7 @@ X[t,,]=R\%*\%F[t,,]\%*\%t(C)+E[t,,]
 fit1 = IALS(X, W1 = NULL, W2 = NULL,k1, k2, max_iter = 100, ep = 1e-06) 
 Distance(fit1$R,R);Distance(fit1$C,C)
 
-library(HDMFA)
-#Estimating the matrix factor model using alpha-PCA as the initial values.
-fit=alpha_PCA(X, k1, k2, alpha=0)
-fit2 = IALS(X, W1 =fit$R , W2 = fit$C, k1, k2, max_iter = 1, ep = 1e-06) 
+#Estimating the matrix factor model using one-step iteration
+fit2 = IALS(X, W1 = NULL , W2 = NULL, k1, k2, max_iter = 1, ep = 1e-06) 
 Distance(fit2$R,R);Distance(fit2$C,C)
 }
